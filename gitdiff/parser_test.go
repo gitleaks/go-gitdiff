@@ -301,6 +301,42 @@ a wild fragment appears?
 `,
 			Err: true,
 		},
+		"mergeHeaderFollowedByNormalHeader": {
+			Input: `commit f6ded7a51cf917bdb44097066fab608c0facde5b
+Merge: b2cf1cd0de 0254477421
+Author: BoloniniD <denis@bolonin.ru>
+Date:   Thu Apr 7 01:07:38 2022 +0300
+
+    Merge branch 'BLAKE3' of github.com:BoloniniD/ClickHouse into BLAKE3
+
+commit 645e156af6b362145fad82d714f8e70a5b5a55a8
+Author: Meena Renganathan <Meena.Renganathan@ibm.com>
+Date:   Wed Apr 6 14:50:10 2022 -0700
+
+    Updated the boringssl-cmake to match the latest broingssl module update
+
+diff --git a/.gitmodules b/.gitmodules
+index 6c9e66f9cb..9cee5f697e 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -207 +206,0 @@
+-       branch = MergeWithUpstream
+`,
+			Output: &File{
+				OldName:      ".gitmodules",
+				NewName:      ".gitmodules",
+				OldMode:      os.FileMode(0100644),
+				OldOIDPrefix: "6c9e66f9cb",
+				NewOIDPrefix: "9cee5f697e",
+			},
+			Preamble: `commit 645e156af6b362145fad82d714f8e70a5b5a55a8
+Author: Meena Renganathan <Meena.Renganathan@ibm.com>
+Date:   Wed Apr 6 14:50:10 2022 -0700
+
+    Updated the boringssl-cmake to match the latest broingssl module update
+
+`,
+		},
 	}
 
 	for name, test := range tests {
