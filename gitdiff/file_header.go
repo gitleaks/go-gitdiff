@@ -30,6 +30,12 @@ func (p *parser) ParseNextFileHeader() (*File, string, error) {
 			return nil, "", p.Errorf(-1, "patch fragment without file header: %s", frag.Header())
 		}
 
+		// check for end of merge header, and start of a new header
+		if strings.HasPrefix(p.Line(0), commitPrefix) {
+			preamble.Reset()
+			goto NextLine
+		}
+
 		// check for a git-generated patch
 		file, err = p.ParseGitFileHeader()
 		if err != nil {
