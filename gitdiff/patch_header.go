@@ -294,9 +294,13 @@ func parseHeaderPretty(prettyLine string, r io.Reader) (*PatchHeader, error) {
 
 	if title != "" {
 		// Don't check for an appendix
-		body, _ := scanMessageBody(s, indent, false)
+		body, _, remainder := scanMessageBody(s, indent, false)
 		if s.Err() != nil {
 			return nil, s.Err()
+		}
+		if remainder != "" {
+			// There was another header immediately after this one.
+			return ParsePatchHeader(remainder)
 		}
 		h.Body = body
 	}
@@ -326,20 +330,32 @@ func scanMessageTitle(s *bufio.Scanner) (title string, indent string) {
 	return b.String(), indent
 }
 
-func scanMessageBody(s *bufio.Scanner, indent string, separateAppendix bool) (string, string) {
+func scanMessageBody(s *bufio.Scanner, indent string, separateAppendix bool) (string, string, string) {
 	// Body and appendix
 	var body, appendix strings.Builder
 	c := &body
 	var empty int
 	for i := 0; s.Scan(); i++ {
-		line := s.Text()
+		baseLine := s.Text()
 
-		line = strings.TrimRightFunc(line, unicode.IsSpace)
+		line := strings.TrimRightFunc(baseLine, unicode.IsSpace)
 		line = strings.TrimPrefix(line, indent)
 
 		if line == "" {
 			empty++
 			continue
+		}
+
+		if baseLine == line && indent != "" {
+			// The line does not start with the indent.
+			var remainder strings.Builder
+			remainder.WriteString(baseLine)
+			remainder.WriteByte('\n')
+			for ; s.Scan(); i++ {
+				remainder.WriteString(s.Text())
+				remainder.WriteByte('\n')
+			}
+			return body.String(), appendix.String(), remainder.String()
 		}
 
 		// If requested, parse out "appendix" information (often added
@@ -359,7 +375,7 @@ func scanMessageBody(s *bufio.Scanner, indent string, separateAppendix bool) (st
 
 		c.WriteString(line)
 	}
-	return body.String(), appendix.String()
+	return body.String(), appendix.String(), ""
 }
 
 func parseHeaderMail(mailLine string, r io.Reader) (*PatchHeader, error) {
@@ -402,7 +418,7 @@ func parseHeaderMail(mailLine string, r io.Reader) (*PatchHeader, error) {
 	h.SubjectPrefix, h.Title = parseSubject(subject)
 
 	s := bufio.NewScanner(msg.Body)
-	h.Body, h.BodyAppendix = scanMessageBody(s, "", true)
+	h.Body, h.BodyAppendix, _ = scanMessageBody(s, "", true)
 	if s.Err() != nil {
 		return nil, s.Err()
 	}

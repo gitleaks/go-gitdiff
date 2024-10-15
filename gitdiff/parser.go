@@ -51,6 +51,7 @@ func Parse(r io.Reader) (<-chan *File, error) {
 
 			for _, fn := range []func(*File) (int, error){
 				p.ParseTextFragments,
+				p.ParseCombinedTextFragments,
 				p.ParseBinaryFragments,
 			} {
 				n, err := fn(file)

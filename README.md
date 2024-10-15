@@ -99,3 +99,8 @@ this testing in the future.
    context of each fragment must exactly match the source file; `git apply`
    implements a search algorithm that tries different lines and amounts of
    context, with further options to normalize or ignore whitespace changes.
+
+7. Multi-parent differences (produced by `git --cc`) are supported with two
+   parents.  The full specification for the difference allows for more than
+   two, but that is not completely supported.
+

@@ -441,6 +441,39 @@ Author: Morton Haypenny <mhaypenny@example.com>
 				Title:  expectedTitle,
 			},
 		},
+		"emptyCommit": {
+			Input: `commit 989f970ba7e43cd0eac6fcf71acfd9c92effc047
+Author: Morton Haypenny <mhaypenny@example.com>
+Date:   Sat Apr 12 05:20:49 2020 -0700
+
+    An empty commit
+
+    With a body.
+
+
+commit 61f5cd90bed4d204ee3feb3aa41ee91d4734855b
+Author: Morton Haypenny <mhaypenny@example.com>
+Date:   Sat Apr 11 15:21:23 2020 -0700
+
+    A sample commit to test header parsing
+
+
+    The medium format shows the body, which
+    may wrap on to multiple lines.
+
+
+    Another body line.
+
+
+`,
+			Header: PatchHeader{
+				SHA:        expectedSHA,
+				Author:     expectedIdentity,
+				AuthorDate: expectedDate,
+				Title:      expectedTitle,
+				Body:       expectedBody,
+			},
+		},
 	}
 
 	for name, test := range tests {

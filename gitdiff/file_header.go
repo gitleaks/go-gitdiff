@@ -29,6 +29,7 @@ func (p *parser) ParseNextFileHeader() (*File, string, error) {
 		if frag != nil {
 			return nil, "", p.Errorf(-1, "patch fragment without file header: %s", frag.Header())
 		}
+		// note: not checking for disconnected combined fragment header.
 
 		// check for end of merge header, and start of a new header
 		if strings.HasPrefix(p.Line(0), commitPrefix) {
@@ -67,12 +68,17 @@ func (p *parser) ParseNextFileHeader() (*File, string, error) {
 }
 
 func (p *parser) ParseGitFileHeader() (*File, error) {
-	const prefix = "diff --git "
+	const prefix1 = "diff --git "
+	const prefix2 = "diff --cc "
+	var header string
 
-	if !strings.HasPrefix(p.Line(0), prefix) {
+	if strings.HasPrefix(p.Line(0), prefix1) {
+		header = p.Line(0)[len(prefix1):]
+	} else if strings.HasPrefix(p.Line(0), prefix2) {
+		header = p.Line(0)[len(prefix2):]
+	} else {
 		return nil, nil
 	}
-	header := p.Line(0)[len(prefix):]
 
 	defaultName, err := parseGitHeaderName(header)
 	if err != nil {
@@ -276,6 +282,9 @@ func parseGitHeaderData(f *File, line, defaultName string) (end bool, err error)
 		parse  func(*File, string, string) error
 	}{
 		{"@@ -", true, nil},
+		// TODO '@@@ -' is the simplest form of the combined diff; it
+		//   could be any number of '@' - one per parent + 1 '@'.
+		{"@@@ -", true, nil},
 		{"--- ", false, parseGitHeaderOldName},
 		{"+++ ", false, parseGitHeaderNewName},
 		{"old mode ", false, parseGitHeaderOldMode},

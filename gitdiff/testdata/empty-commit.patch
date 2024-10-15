@@ -1,0 +1,83 @@
+
+commit 48f13f61afb200ad8386573632cba3abd1703af2
+Author: Morton Haypenny <mhaypenny@example.com>
+Date:   Thu Nov 3 12:29:49 2017 +0000
+
+    A simple change
+
+    The change is simple.
+
+diff --git a/dir/file1.txt b/dir/file1.txt
+index 422cce7..24b39ed 100644
+--- a/dir/file1.txt
++++ b/dir/file1.txt
+@@ -3,6 +3,8 @@ fragment 1
+ context line
+-old line 1
+-old line 2
+ context line
++new line 1
++new line 2
++new line 3
+ context line
+-old line 3
++new line 4
++new line 5
+@@ -31,2 +33,2 @@ fragment 2
+ context line
+-old line 4
++new line 6
+
+commit dbbc5f1e926391d737e397ec60cc1ff94787e105
+Author: Regina Smithee <rsmithee@example.com>
+Date:   Thu Sep 29 12:58:35 2017 +0000
+
+    Merged commit 3
+
+    Merged body 3.
+
+
+commit f90c2e23af6618388cb4082f39849476e39105af
+Merge: 989f970 e84c7ab
+Author: Regina Smithee <rsmithee@example.com>
+Date:   Thu Sep 15 16:37:30 2017 +0000
+
+    Merged commit 2
+
+
+commit 989f970ba7e43cd0eac6fcf71acfd9c92effc047
+Merge: 183d9cd e84c7ab
+Author: Regina Smithee <rsmithee@example.com>
+Date:   Thu Sep 15 14:41:57 2017 +0000
+
+    Merged commit 1
+
+
+commit 183d9cdbecda47e6e95acf9e4e23fa3a71ba99ad
+Author: Regina Smithee <rsmithee@example.com>
+Date:   Wed Sep 14 19:46:12 2017 +0000
+
+    Simple change
+
+    Simple change body.
+
+diff --git a/d1/file2.txt b/d1/file2.txt
+index c6513ff..bf4c6cc 100755
+--- a/d1/file2.txt
++++ b/d1/file2.txt
+@@ -3,6 +3,8 @@ fragment 1
+ context line
+-old line 1
+-old line 2
+ context line
++new line 1
++new line 2
++new line 3
+ context line
+-old line 3
++new line 4
++new line 5
+@@ -31,2 +33,2 @@ fragment 2
+ context line
+-old line 4
++new line 6

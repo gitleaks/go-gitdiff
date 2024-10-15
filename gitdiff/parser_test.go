@@ -103,6 +103,20 @@ context line
 			},
 			EndLine: "@@ -1,2 +1,3 @@\n",
 		},
+		"ParseCCFileHeader": {
+			Input: `diff --cc a/dir/file.txt b/dir/file.txt
+index 9540595..30e6333 100644
+--- a/dir/file.txt
++++ b/dir/file.txt
+@@ -1,2 +1,3 @@
+context line
+`,
+			Parse: func(p *parser) error {
+				_, err := p.ParseGitFileHeader()
+				return err
+			},
+			EndLine: "@@ -1,2 +1,3 @@\n",
+		},
 		"ParseTraditionalFileHeader": {
 			Input: `--- dir/file.txt
 +++ dir/file.txt
@@ -528,6 +542,173 @@ Date:   Tue Apr 2 22:55:40 2019 -0700
 				},
 			},
 			Preamble: binaryPreamble,
+		},
+		"threeCombinedFiles": {
+			InputFile: "testdata/three_combined_files.patch",
+			Output: []*File{
+				{
+					PatchHeader: &PatchHeader{
+						SHA: "5d9790fec7d95aa223f3d20936340bf55ff3dcbe",
+						Author: &PatchIdentity{
+							Name:  "Morton Haypenny",
+							Email: "mhaypenny@example.com",
+						},
+						AuthorDate: asTime("2019-04-02T22:55:40-07:00"),
+						Title:      "A file with multiple fragments, including multiple parents.",
+						Body:       "The content is arbitrary.",
+					},
+					OldName:       "dir/file1.txt",
+					NewName:       "dir/file1.txt",
+					OldMode:       os.FileMode(0100644),
+					OldOIDPrefix:  "ebe9fa54",
+					NewOIDPrefix:  "fe103e1d",
+					TextFragments: textFragments,
+				},
+				{
+					PatchHeader: &PatchHeader{
+						SHA: "5d9790fec7d95aa223f3d20936340bf55ff3dcbe",
+						Author: &PatchIdentity{
+							Name:  "Morton Haypenny",
+							Email: "mhaypenny@example.com",
+						},
+						AuthorDate: asTime("2019-04-02T22:55:40-07:00"),
+						Title:      "A file with multiple fragments, including multiple parents.",
+						Body:       "The content is arbitrary.",
+					},
+					OldName:      "dir/file2.txt",
+					NewName:      "dir/file2.txt",
+					OldMode:      os.FileMode(0100644),
+					OldOIDPrefix: "417ebc70",
+					NewOIDPrefix: "67514b7f",
+					TextFragments: []*TextFragment{
+						{
+							OldPosition: 3,
+							OldLines:    3,
+							NewPosition: 3,
+							NewLines:    0,
+							Comment:     "fragment 1",
+							Lines: []Line{
+								{OpContext, "context line\n"},
+								{OpDelete, "old line 1\n"},
+								{OpContext, "old line 2\n"},
+								{OpContext, "context line\n"},
+							},
+							LinesAdded:      0,
+							LinesDeleted:    1,
+							LeadingContext:  1,
+							TrailingContext: 1,
+						},
+						{
+							OldPosition: 2,
+							OldLines:    3,
+							NewPosition: 3,
+							NewLines:    0,
+							Comment:     "fragment 1",
+							Lines: []Line{
+								{OpContext, "context line\n"},
+								{OpContext, "old line 1\n"},
+								{OpDelete, "old line 2\n"},
+								{OpContext, "context line\n"},
+							},
+							LinesAdded:      0,
+							LinesDeleted:    1,
+							LeadingContext:  1,
+							TrailingContext: 1,
+						},
+						{
+							OldPosition: 31,
+							OldLines:    2,
+							NewPosition: 33,
+							NewLines:    1,
+							Comment:     "fragment 2",
+							Lines: []Line{
+								{OpContext, "context line\n"},
+								{OpDelete, "old line 1\n"},
+								{OpAdd, "new line 2\n"},
+							},
+							LinesAdded:     1,
+							LinesDeleted:   1,
+							LeadingContext: 1,
+						},
+						{
+							OldPosition: 30,
+							OldLines:    2,
+							NewPosition: 33,
+							NewLines:    1,
+							Comment:     "fragment 2",
+							Lines: []Line{
+								{OpContext, "context line\n"},
+								{OpContext, "old line 1\n"},
+								{OpContext, "new line 2\n"},
+							},
+							LinesAdded:     0,
+							LinesDeleted:   0,
+							LeadingContext: 1,
+						},
+					},
+				},
+				{
+					PatchHeader: &PatchHeader{
+						SHA: "5d9790fec7d95aa223f3d20936340bf55ff3dcbe",
+						Author: &PatchIdentity{
+							Name:  "Morton Haypenny",
+							Email: "mhaypenny@example.com",
+						},
+						AuthorDate: asTime("2019-04-02T22:55:40-07:00"),
+						Title:      "A file with multiple fragments, including multiple parents.",
+						Body:       "The content is arbitrary.",
+					},
+					OldName:       "dir/file3.txt",
+					NewName:       "dir/file3.txt",
+					OldMode:       os.FileMode(0100644),
+					OldOIDPrefix:  "1b39fa54",
+					NewOIDPrefix:  "f5103e1d",
+					TextFragments: textFragments,
+				},
+			},
+			Preamble: textPreamble,
+		},
+		"emptyCommit": {
+			InputFile: "testdata/empty-commit.patch",
+			Output: []*File{
+				{
+					PatchHeader: &PatchHeader{
+						SHA: "48f13f61afb200ad8386573632cba3abd1703af2",
+						Author: &PatchIdentity{
+							Name:  "Morton Haypenny",
+							Email: "mhaypenny@example.com",
+						},
+						AuthorDate: asTime("2017-11-03T12:29:49Z"),
+						Title:      "A simple change",
+						Body:       "The change is simple.",
+					},
+					OldName:       "dir/file1.txt",
+					NewName:       "dir/file1.txt",
+					OldMode:       os.FileMode(0100644),
+					OldOIDPrefix:  "422cce7",
+					NewOIDPrefix:  "24b39ed",
+					TextFragments: textFragments,
+				},
+				{
+					PatchHeader: &PatchHeader{
+						SHA: "183d9cdbecda47e6e95acf9e4e23fa3a71ba99ad",
+						Author: &PatchIdentity{
+							Name:  "Regina Smithee",
+							Email: "rsmithee@example.com",
+						},
+						AuthorDate: asTime("2017-09-14T19:46:12Z"),
+						Title:      "Simple change",
+						Body:       "Simple change body.",
+					},
+					OldName:       "d1/file2.txt",
+					NewName:       "d1/file2.txt",
+					OldMode:       os.FileMode(0100755),
+					OldOIDPrefix:  "c6513ff",
+					NewOIDPrefix:  "bf4c6cc",
+					TextFragments: textFragments,
+				},
+			},
+			Preamble: textPreamble,
 		},
 	}
 
